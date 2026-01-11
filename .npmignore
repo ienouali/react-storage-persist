@@ -1,0 +1,23 @@
+# .npmignore
+src
+tests
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+tsconfig.json
+tsconfig.build.json
+tsconfig.test.json
+vitest.config.ts
+playwright.config.ts
+vite.config.ts
+eslint.config.js
+prettier.config.js
+.idea
+.github
+.vscode
+.changeset
+coverage
+test-results
+playwright-report
+*.log
