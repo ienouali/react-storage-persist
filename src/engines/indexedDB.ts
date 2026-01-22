@@ -1,5 +1,3 @@
-// src/engines/indexedDB.ts
-
 import { BaseStorageEngine } from './base';
 import type { StorageEngine } from '../types';
 import { StorageError, StorageErrorCode } from '../types/errors';
@@ -45,7 +43,6 @@ export class IndexedDBEngine extends BaseStorageEngine {
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
 
-        // Create object store if it doesn't exist
         if (!db.objectStoreNames.contains(STORE_NAME)) {
           db.createObjectStore(STORE_NAME);
         }
@@ -99,7 +96,6 @@ export class IndexedDBEngine extends BaseStorageEngine {
     try {
       await this.withStore('readwrite', (store) => store.put(value, key));
     } catch (error) {
-      // Check for quota errors
       if (error instanceof Error && error.name === 'QuotaExceededError') {
         throw new StorageError(
           `Storage quota exceeded when setting "${key}"`,

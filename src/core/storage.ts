@@ -1,5 +1,3 @@
-// core/storage.ts
-
 import type {
   StorageConfig,
   StorageOptions,
@@ -7,13 +5,19 @@ import type {
   StorageChangeEvent,
   IStorageEngine,
   Middleware,
+  StorageEventType,
+  StorageEngine,
+  Serializer,
 } from '../types';
+import { StorageError, StorageErrorCode } from '../types/errors';
+import { createEngine, getAvailableEngine } from '../engines/factory';
 
 export class Storage {
   private engine: IStorageEngine;
   private config: Required<StorageConfig>;
   private listeners: Map<string, Set<(event: StorageChangeEvent) => void>>;
   private middleware: Middleware[];
+  private cleanupInterval: NodeJS.Timeout | null = null;
 
   constructor(config: StorageConfig = {}) {
     this.config = this.normalizeConfig(config);
@@ -21,10 +25,9 @@ export class Storage {
     this.listeners = new Map();
     this.middleware = [];
 
-    // Setup cleanup for expired items
-    this.setupCleanup();
-
-    // Setup cross-tab sync
+    if (this.config.ttl > 0) {
+      this.setupCleanup();
+    }
     this.setupSync();
   }
 
@@ -37,18 +40,18 @@ export class Storage {
       const raw = await this.engine.getItem(fullKey);
 
       if (raw === null) {
+        this.log('get', key, 'not found');
         return defaultValue ?? null;
       }
 
       const item = this.deserialize<StorageItem<T>>(raw);
 
-      // Check expiration
       if (this.isExpired(item)) {
+        this.log('get', key, 'expired');
         await this.remove(key);
         return defaultValue ?? null;
       }
 
-      // Apply middleware
       let value = item.value;
       for (const mw of this.middleware) {
         if (mw.afterGet) {
@@ -57,6 +60,8 @@ export class Storage {
       }
 
       this.log('get', key, value);
+      this.emit('get', { key, newValue: value });
+
       return value;
     } catch (error) {
       this.handleError('get', key, error);
@@ -72,7 +77,6 @@ export class Storage {
       const fullKey = this.getFullKey(key);
       const oldValue = await this.get<T>(key);
 
-      // Apply middleware
       let processedValue = value;
       for (const mw of this.middleware) {
         if (mw.beforeSet) {
@@ -92,7 +96,10 @@ export class Storage {
       await this.engine.setItem(fullKey, serialized);
 
       this.log('set', key, value);
-      this.emit('set', { key, oldValue, newValue: value });
+
+      if (!options?.silent) {
+        this.emit('set', { key, oldValue, newValue: value });
+      }
     } catch (error) {
       this.handleError('set', key, error);
       throw error;
@@ -107,7 +114,6 @@ export class Storage {
       const fullKey = this.getFullKey(key);
       const oldValue = await this.get(key);
 
-      // Apply middleware
       for (const mw of this.middleware) {
         if (mw.beforeRemove) {
           await mw.beforeRemove(key);
@@ -144,10 +150,15 @@ export class Storage {
    * Get all keys (without prefix/suffix)
    */
   async keys(): Promise<string[]> {
-    const allKeys = await this.engine.keys();
-    return allKeys
-      .filter((key) => this.matchesNamespace(key))
-      .map((key) => this.stripNamespace(key));
+    try {
+      const allKeys = await this.engine.keys();
+      return allKeys
+          .filter((key) => this.matchesNamespace(key))
+          .map((key) => this.stripNamespace(key));
+    } catch (error) {
+      this.handleError('keys', '*', error);
+      return [];
+    }
   }
 
   /**
@@ -159,20 +170,33 @@ export class Storage {
   }
 
   /**
-   * Get storage size (approximate)
+   * Get storage size (approximate in bytes)
    */
   async size(): Promise<number> {
-    const keys = await this.keys();
-    let total = 0;
+    try {
+      const keys = await this.keys();
+      let total = 0;
 
-    for (const key of keys) {
-      const value = await this.engine.getItem(this.getFullKey(key));
-      if (value) {
-        total += value.length * 2; // UTF-16 characters = 2 bytes
+      for (const key of keys) {
+        const value = await this.engine.getItem(this.getFullKey(key));
+        if (value) {
+          total += value.length * 2;
+        }
       }
-    }
 
-    return total;
+      return total;
+    } catch (error) {
+      this.handleError('size', '*', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Get number of items
+   */
+  async length(): Promise<number> {
+    const keys = await this.keys();
+    return keys.length;
   }
 
   /**
@@ -180,14 +204,15 @@ export class Storage {
    */
   use(middleware: Middleware): void {
     this.middleware.push(middleware);
+    this.log('middleware added', middleware.name);
   }
 
   /**
    * Subscribe to storage changes
    */
   subscribe(
-    keyOrCallback: string | ((event: StorageChangeEvent) => void),
-    callback?: (event: StorageChangeEvent) => void
+      keyOrCallback: string | ((event: StorageChangeEvent) => void),
+      callback?: (event: StorageChangeEvent) => void
   ): () => void {
     const key = typeof keyOrCallback === 'string' ? keyOrCallback : '*';
     const handler = typeof keyOrCallback === 'function' ? keyOrCallback : callback!;
@@ -198,13 +223,26 @@ export class Storage {
 
     this.listeners.get(key)!.add(handler);
 
-    // Return unsubscribe function
     return () => {
       this.listeners.get(key)?.delete(handler);
+      if (this.listeners.get(key)?.size === 0) {
+        this.listeners.delete(key);
+      }
     };
   }
 
-  // Private methods...
+  /**
+   * Destroy storage instance and cleanup
+   */
+  destroy(): void {
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = null;
+    }
+    this.listeners.clear();
+    this.middleware = [];
+    this.log('destroyed');
+  }
 
   private normalizeConfig(config: StorageConfig): Required<StorageConfig> {
     return {
@@ -212,7 +250,11 @@ export class Storage {
       prefix: config.prefix ?? '',
       suffix: config.suffix ?? '',
       ttl: config.ttl ?? 0,
-      fallback: config.fallback ?? ['memory'],
+      fallback: Array.isArray(config.fallback)
+          ? config.fallback
+          : config.fallback
+              ? [config.fallback]
+              : ['memory'],
       serializer: config.serializer ?? {
         serialize: JSON.stringify,
         deserialize: JSON.parse,
@@ -227,9 +269,28 @@ export class Storage {
   }
 
   private initializeEngine(): IStorageEngine {
-    // Try primary engine
-    // Fall back to alternatives if not available
-    // Implementation details...
+    const primaryEngine = createEngine(this.config.engine);
+    if (primaryEngine.isAvailable()) {
+      this.log('engine initialized', this.config.engine);
+      return primaryEngine;
+    }
+
+    const fallbackEngines = Array.isArray(this.config.fallback)
+        ? this.config.fallback
+        : [this.config.fallback];
+
+    for (const engineType of fallbackEngines) {
+      const engine = createEngine(engineType);
+      if (engine.isAvailable()) {
+        this.log('using fallback engine', engineType);
+        return engine;
+      }
+    }
+
+    throw new StorageError(
+        'No storage engine available',
+        StorageErrorCode.NOT_AVAILABLE
+    );
   }
 
   private getFullKey(key: string): string {
@@ -258,11 +319,27 @@ export class Storage {
   }
 
   private serialize<T>(value: T): string {
-    return this.config.serializer.serialize(value);
+    try {
+      return this.config.serializer.serialize(value);
+    } catch (error) {
+      throw new StorageError(
+          'Serialization failed',
+          StorageErrorCode.SERIALIZATION_FAILED,
+          error as Error
+      );
+    }
   }
 
   private deserialize<T>(value: string): T {
-    return this.config.serializer.deserialize(value);
+    try {
+      return this.config.serializer.deserialize(value);
+    } catch (error) {
+      throw new StorageError(
+          'Deserialization failed',
+          StorageErrorCode.DESERIALIZATION_FAILED,
+          error as Error
+      );
+    }
   }
 
   private isExpired(item: StorageItem): boolean {
@@ -285,24 +362,24 @@ export class Storage {
       timestamp: Date.now(),
     };
 
-    // Notify specific key listeners
     this.listeners.get(event.key ?? '')?.forEach((handler) => handler(fullEvent));
 
-    // Notify wildcard listeners
     this.listeners.get('*')?.forEach((handler) => handler(fullEvent));
 
-    // Call config onChange
     this.config.onChange(fullEvent);
   }
 
   private handleError(operation: string, key: string, error: any): void {
-    const storageError = new StorageError(
-      `Storage ${operation} failed for key "${key}"`,
-      StorageErrorCode.OPERATION_FAILED,
-      error
-    );
+    const storageError =
+        error instanceof StorageError
+            ? error
+            : new StorageError(
+                `Storage ${operation} failed for key "${key}"`,
+                StorageErrorCode.OPERATION_FAILED,
+                error as Error
+            );
 
-    this.log('error', key, error);
+    this.log('error', operation, key, error);
     this.emit('error', { key });
     this.config.onError(storageError);
   }
@@ -314,10 +391,37 @@ export class Storage {
   }
 
   private setupCleanup(): void {
-    // Periodic cleanup of expired items
+    this.cleanupInterval = setInterval(async () => {
+      try {
+        const keys = await this.keys();
+        for (const key of keys) {
+          await this.get(key);
+        }
+        this.log('cleanup completed');
+      } catch (error) {
+        this.log('cleanup error', error);
+      }
+    }, 5 * 60 * 1000);
   }
 
   private setupSync(): void {
-    // Cross-tab synchronization via storage events
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', (event) => {
+        if (!event.key) return;
+
+        if (!this.matchesNamespace(event.key)) return;
+
+        const key = this.stripNamespace(event.key);
+
+        try {
+          const oldValue = event.oldValue ? this.deserialize(event.oldValue) : null;
+          const newValue = event.newValue ? this.deserialize(event.newValue) : null;
+
+          this.emit('set', { key, oldValue, newValue });
+        } catch (error) {
+          this.log('sync error', error);
+        }
+      });
+    }
   }
 }

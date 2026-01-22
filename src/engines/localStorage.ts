@@ -36,7 +36,6 @@ export class LocalStorageEngine extends BaseStorageEngine {
     try {
       window.localStorage.setItem(key, value);
     } catch (error) {
-      // Check if it's a quota exceeded error
       if (this.isQuotaExceededError(error)) {
         throw new StorageError(
           `Storage quota exceeded when setting "${key}"`,

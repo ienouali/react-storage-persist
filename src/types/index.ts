@@ -18,7 +18,7 @@ export interface StorageConfig {
   engine?: StorageEngine;
   prefix?: string;
   suffix?: string;
-  ttl?: number; // seconds
+  ttl?: number;
   fallback?: StorageEngine | StorageEngine[];
   serializer?: Serializer;
   encrypt?: boolean;
@@ -33,7 +33,7 @@ export interface StorageOptions {
   ttl?: number;
   encrypt?: boolean;
   compress?: boolean;
-  silent?: boolean; // Don't emit events
+  silent?: boolean;
 }
 
 export type StorageEventType = 'set' | 'get' | 'remove' | 'clear' | 'error';
@@ -46,34 +46,17 @@ export interface StorageChangeEvent<T = any> {
   timestamp: number;
 }
 
-export class StorageError extends Error {
-  constructor(
-    message: string,
-    public code: StorageErrorCode,
-    public originalError?: Error
-  ) {
-    super(message);
-    this.name = 'StorageError';
-  }
-}
-
-export enum StorageErrorCode {
-  NOT_AVAILABLE = 'NOT_AVAILABLE',
-  QUOTA_EXCEEDED = 'QUOTA_EXCEEDED',
-  SERIALIZATION_FAILED = 'SERIALIZATION_FAILED',
-  DESERIALIZATION_FAILED = 'DESERIALIZATION_FAILED',
-  ENCRYPTION_FAILED = 'ENCRYPTION_FAILED',
-  INVALID_KEY = 'INVALID_KEY',
-  OPERATION_FAILED = 'OPERATION_FAILED',
-}
-
 export interface Middleware {
   name: string;
-  beforeSet?: <T>(key: string, value: T, options?: StorageOptions) => T | Promise<T>;
+  beforeSet?: <T>(
+      key: string,
+      value: T,
+      options?: StorageOptions
+  ) => T | Promise<T>;
   afterGet?: <T>(
-    key: string,
-    value: T | null,
-    options?: StorageOptions
+      key: string,
+      value: T | null,
+      options?: StorageOptions
   ) => T | null | Promise<T | null>;
   beforeRemove?: (key: string) => void | Promise<void>;
 }
@@ -88,3 +71,5 @@ export interface IStorageEngine {
   keys(): string[] | Promise<string[]>;
   length(): number | Promise<number>;
 }
+
+export { StorageError, StorageErrorCode } from './errors';

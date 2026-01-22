@@ -10,7 +10,6 @@ afterEach(() => {
 
 global.indexedDB = {} as IDBFactory;
 
-// Setup console mocks
 global.console = {
     ...console,
     error: vi.fn(),
