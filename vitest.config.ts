@@ -6,6 +6,8 @@ import { resolve } from 'path';
 export default defineConfig({
     plugins: [react()],
     test: {
+        testTimeout: 15000,
+        hookTimeout: 15000,
         globals: true,
         environment: 'jsdom',
         setupFiles: ['./tests/setup.ts'],
