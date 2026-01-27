@@ -161,7 +161,7 @@ export class IndexedDBEngine extends BaseStorageEngine {
     }
   }
 
-  async getMany(keys: string[]): Promise<Map<string, string | null>> {
+  override async getMany(keys: string[]): Promise<Map<string, string | null>> {
     const db = await this.getDB();
     const transaction = db.transaction(STORE_NAME, 'readonly');
     const store = transaction.objectStore(STORE_NAME);
@@ -184,7 +184,7 @@ export class IndexedDBEngine extends BaseStorageEngine {
     return results;
   }
 
-  async setMany(entries: Map<string, string>): Promise<void> {
+  override async setMany(entries: Map<string, string>): Promise<void> {
     const db = await this.getDB();
     const transaction = db.transaction(STORE_NAME, 'readwrite');
     const store = transaction.objectStore(STORE_NAME);
@@ -201,7 +201,7 @@ export class IndexedDBEngine extends BaseStorageEngine {
     );
   }
 
-  async removeMany(keys: string[]): Promise<void> {
+  override async removeMany(keys: string[]): Promise<void> {
     const db = await this.getDB();
     const transaction = db.transaction(STORE_NAME, 'readwrite');
     const store = transaction.objectStore(STORE_NAME);

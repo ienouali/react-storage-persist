@@ -6,18 +6,17 @@ import type {
   IStorageEngine,
   Middleware,
   StorageEventType,
-  StorageEngine,
-  Serializer,
 } from '../types';
+
 import { StorageError, StorageErrorCode } from '../types/errors';
-import { createEngine, getAvailableEngine } from '../engines/factory';
+import { createEngine } from '../engines/factory';
 
 export class Storage {
   private engine: IStorageEngine;
   private config: Required<StorageConfig>;
   private listeners: Map<string, Set<(event: StorageChangeEvent) => void>>;
   private middleware: Middleware[];
-  private cleanupInterval: NodeJS.Timeout | null = null;
+  private cleanupInterval: any | null = null;
 
   constructor(config: StorageConfig = {}) {
     this.config = this.normalizeConfig(config);
@@ -55,6 +54,8 @@ export class Storage {
       let value = item.value;
       for (const mw of this.middleware) {
         if (mw.afterGet) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-expect-error
           value = await mw.afterGet(key, value);
         }
       }
@@ -153,8 +154,8 @@ export class Storage {
     try {
       const allKeys = await this.engine.keys();
       return allKeys
-          .filter((key) => this.matchesNamespace(key))
-          .map((key) => this.stripNamespace(key));
+        .filter((key) => this.matchesNamespace(key))
+        .map((key) => this.stripNamespace(key));
     } catch (error) {
       this.handleError('keys', '*', error);
       return [];
@@ -211,8 +212,8 @@ export class Storage {
    * Subscribe to storage changes
    */
   subscribe(
-      keyOrCallback: string | ((event: StorageChangeEvent) => void),
-      callback?: (event: StorageChangeEvent) => void
+    keyOrCallback: string | ((event: StorageChangeEvent) => void),
+    callback?: (event: StorageChangeEvent) => void
   ): () => void {
     const key = typeof keyOrCallback === 'string' ? keyOrCallback : '*';
     const handler = typeof keyOrCallback === 'function' ? keyOrCallback : callback!;
@@ -236,7 +237,7 @@ export class Storage {
    */
   destroy(): void {
     if (this.cleanupInterval) {
-      clearInterval(this.cleanupInterval);
+      window.clearInterval(this.cleanupInterval);
       this.cleanupInterval = null;
     }
     this.listeners.clear();
@@ -251,10 +252,10 @@ export class Storage {
       suffix: config.suffix ?? '',
       ttl: config.ttl ?? 0,
       fallback: Array.isArray(config.fallback)
-          ? config.fallback
-          : config.fallback
-              ? [config.fallback]
-              : ['memory'],
+        ? config.fallback
+        : config.fallback
+          ? [config.fallback]
+          : ['memory'],
       serializer: config.serializer ?? {
         serialize: JSON.stringify,
         deserialize: JSON.parse,
@@ -276,8 +277,8 @@ export class Storage {
     }
 
     const fallbackEngines = Array.isArray(this.config.fallback)
-        ? this.config.fallback
-        : [this.config.fallback];
+      ? this.config.fallback
+      : [this.config.fallback];
 
     for (const engineType of fallbackEngines) {
       const engine = createEngine(engineType);
@@ -287,10 +288,7 @@ export class Storage {
       }
     }
 
-    throw new StorageError(
-        'No storage engine available',
-        StorageErrorCode.NOT_AVAILABLE
-    );
+    throw new StorageError('No storage engine available', StorageErrorCode.NOT_AVAILABLE);
   }
 
   private getFullKey(key: string): string {
@@ -323,9 +321,9 @@ export class Storage {
       return this.config.serializer.serialize(value);
     } catch (error) {
       throw new StorageError(
-          'Serialization failed',
-          StorageErrorCode.SERIALIZATION_FAILED,
-          error as Error
+        'Serialization failed',
+        StorageErrorCode.SERIALIZATION_FAILED,
+        error as Error
       );
     }
   }
@@ -335,9 +333,9 @@ export class Storage {
       return this.config.serializer.deserialize(value);
     } catch (error) {
       throw new StorageError(
-          'Deserialization failed',
-          StorageErrorCode.DESERIALIZATION_FAILED,
-          error as Error
+        'Deserialization failed',
+        StorageErrorCode.DESERIALIZATION_FAILED,
+        error as Error
       );
     }
   }
@@ -371,13 +369,13 @@ export class Storage {
 
   private handleError(operation: string, key: string, error: any): void {
     const storageError =
-        error instanceof StorageError
-            ? error
-            : new StorageError(
-                `Storage ${operation} failed for key "${key}"`,
-                StorageErrorCode.OPERATION_FAILED,
-                error as Error
-            );
+      error instanceof StorageError
+        ? error
+        : new StorageError(
+            `Storage ${operation} failed for key "${key}"`,
+            StorageErrorCode.OPERATION_FAILED,
+            error as Error
+          );
 
     this.log('error', operation, key, error);
     this.emit('error', { key });
@@ -391,17 +389,20 @@ export class Storage {
   }
 
   private setupCleanup(): void {
-    this.cleanupInterval = setInterval(async () => {
-      try {
-        const keys = await this.keys();
-        for (const key of keys) {
-          await this.get(key);
+    this.cleanupInterval = window.setInterval(
+      async () => {
+        try {
+          const keys = await this.keys();
+          for (const key of keys) {
+            await this.get(key);
+          }
+          this.log('cleanup completed');
+        } catch (error) {
+          this.log('cleanup error', error);
         }
-        this.log('cleanup completed');
-      } catch (error) {
-        this.log('cleanup error', error);
-      }
-    }, 5 * 60 * 1000);
+      },
+      5 * 60 * 1000
+    );
   }
 
   private setupSync(): void {

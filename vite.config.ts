@@ -9,8 +9,9 @@ export default defineConfig({
         dts({
             insertTypesEntry: true,
             include: ['src/**/*'],
-            exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'tests/**/*'],
+            exclude: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'tests/**/*', 'demo/**/*'],
             rollupTypes: true,
+            copyDtsFiles: true,
         }),
     ],
     build: {
@@ -37,11 +38,18 @@ export default defineConfig({
                 },
                 exports: 'named',
                 preserveModules: false,
+                interop: 'auto',
+            },
+            treeshake: {
+                moduleSideEffects: false,
+                propertyReadSideEffects: false,
             },
         },
         sourcemap: true,
         minify: 'esbuild',
         target: 'es2020',
+        reportCompressedSize: true,
+        chunkSizeWarningLimit: 500,
     },
     resolve: {
         alias: {

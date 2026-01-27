@@ -22,32 +22,26 @@ export function resetDefaultStorage(): void {
 }
 
 export const get = <T = any>(key: string, defaultValue?: T): Promise<T | null> =>
-    getDefaultStorage().get<T>(key, defaultValue);
+  getDefaultStorage().get<T>(key, defaultValue);
 
 export const set = <T = any>(key: string, value: T, options?: StorageOptions): Promise<void> =>
-    getDefaultStorage().set(key, value, options);
+  getDefaultStorage().set(key, value, options);
 
-export const remove = (key: string): Promise<void> =>
-    getDefaultStorage().remove(key);
+export const remove = (key: string): Promise<void> => getDefaultStorage().remove(key);
 
-export const clear = (): Promise<void> =>
-    getDefaultStorage().clear();
+export const clear = (): Promise<void> => getDefaultStorage().clear();
 
-export const keys = (): Promise<string[]> =>
-    getDefaultStorage().keys();
+export const keys = (): Promise<string[]> => getDefaultStorage().keys();
 
-export const has = (key: string): Promise<boolean> =>
-    getDefaultStorage().has(key);
+export const has = (key: string): Promise<boolean> => getDefaultStorage().has(key);
 
-export const size = (): Promise<number> =>
-    getDefaultStorage().size();
+export const size = (): Promise<number> => getDefaultStorage().size();
 
-export const length = (): Promise<number> =>
-    getDefaultStorage().length();
+export const length = (): Promise<number> => getDefaultStorage().length();
 
 export const subscribe = (
-    keyOrCallback: string | ((event: StorageChangeEvent) => void),
-    callback?: (event: StorageChangeEvent) => void
+  keyOrCallback: string | ((event: StorageChangeEvent) => void),
+  callback?: (event: StorageChangeEvent) => void
 ): (() => void) => getDefaultStorage().subscribe(keyOrCallback, callback);
 
 export { Storage } from './storage';

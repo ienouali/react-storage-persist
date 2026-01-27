@@ -18,15 +18,6 @@ export default [
                     jsx: true,
                 },
             },
-            globals: {
-                console: 'readonly',
-                window: 'readonly',
-                document: 'readonly',
-                localStorage: 'readonly',
-                sessionStorage: 'readonly',
-                indexedDB: 'readonly',
-                navigator: 'readonly',
-            },
         },
         plugins: {
             '@typescript-eslint': typescript,
@@ -39,7 +30,6 @@ export default [
             ...react.configs.recommended.rules,
             ...reactHooks.configs.recommended.rules,
 
-            // TypeScript
             '@typescript-eslint/explicit-function-return-type': 'off',
             '@typescript-eslint/explicit-module-boundary-types': 'off',
             '@typescript-eslint/no-explicit-any': 'warn',
@@ -51,18 +41,16 @@ export default [
                 prefer: 'type-imports',
             }],
 
-            // React
             'react/react-in-jsx-scope': 'off',
             'react/prop-types': 'off',
             'react-hooks/rules-of-hooks': 'error',
             'react-hooks/exhaustive-deps': 'warn',
 
-            // General
             'no-console': ['warn', { allow: ['warn', 'error'] }],
             'prefer-const': 'error',
             'no-var': 'error',
+            'no-undef': 'off',
 
-            // Prettier
             'prettier/prettier': 'error',
         },
         settings: {

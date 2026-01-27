@@ -33,7 +33,7 @@ export class MemoryStorageEngine extends BaseStorageEngine {
     return this.store.size;
   }
 
-  getMany(keys: string[]): Promise<Map<string, string | null>> {
+  override getMany(keys: string[]): Promise<Map<string, string | null>> {
     const results = new Map<string, string | null>();
     for (const key of keys) {
       results.set(key, this.store.get(key) ?? null);
@@ -41,14 +41,14 @@ export class MemoryStorageEngine extends BaseStorageEngine {
     return Promise.resolve(results);
   }
 
-  setMany(entries: Map<string, string>): Promise<void> {
+  override setMany(entries: Map<string, string>): Promise<void> {
     for (const [key, value] of entries) {
       this.store.set(key, value);
     }
     return Promise.resolve();
   }
 
-  removeMany(keys: string[]): Promise<void> {
+  override removeMany(keys: string[]): Promise<void> {
     for (const key of keys) {
       this.store.delete(key);
     }

@@ -1,3 +1,5 @@
+import type { StorageError } from '@/types/errors';
+
 export type StorageEngine = 'localStorage' | 'sessionStorage' | 'indexedDB' | 'memory';
 
 export interface Serializer<T = any> {
@@ -18,7 +20,7 @@ export interface StorageConfig {
   engine?: StorageEngine;
   prefix?: string;
   suffix?: string;
-  ttl?: number;
+  ttl?: number; // seconds
   fallback?: StorageEngine | StorageEngine[];
   serializer?: Serializer;
   encrypt?: boolean;
@@ -33,7 +35,7 @@ export interface StorageOptions {
   ttl?: number;
   encrypt?: boolean;
   compress?: boolean;
-  silent?: boolean;
+  silent?: boolean; // Don't emit events
 }
 
 export type StorageEventType = 'set' | 'get' | 'remove' | 'clear' | 'error';
@@ -48,15 +50,11 @@ export interface StorageChangeEvent<T = any> {
 
 export interface Middleware {
   name: string;
-  beforeSet?: <T>(
-      key: string,
-      value: T,
-      options?: StorageOptions
-  ) => T | Promise<T>;
+  beforeSet?: <T>(key: string, value: T, options?: StorageOptions) => T | Promise<T>;
   afterGet?: <T>(
-      key: string,
-      value: T | null,
-      options?: StorageOptions
+    key: string,
+    value: T | null,
+    options?: StorageOptions
   ) => T | null | Promise<T | null>;
   beforeRemove?: (key: string) => void | Promise<void>;
 }

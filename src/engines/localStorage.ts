@@ -107,10 +107,9 @@ export class LocalStorageEngine extends BaseStorageEngine {
   private isQuotaExceededError(error: unknown): boolean {
     if (!(error instanceof Error)) return false;
 
-    return (
+    return Boolean(
       error.name === 'QuotaExceededError' ||
-      error.name === 'NS_ERROR_DOM_QUOTA_REACHED' || // Firefox
-      // Safari in private mode
+      error.name === 'NS_ERROR_DOM_QUOTA_REACHED' ||
       (error.message && error.message.includes('quota'))
     );
   }

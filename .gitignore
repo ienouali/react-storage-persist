@@ -4,6 +4,8 @@ out
 gen
 # .gitignore
 node_modules
+website/node_modules
+website/.next
 dist
 coverage
 .vitest
