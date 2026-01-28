@@ -801,10 +801,10 @@ Inspired by libraries like [localforage](https://github.com/localForage/localFor
 
 - 📫 [Report Issues](https://github.com/ienouali/react-storage-persist/issues)
 - 💬 [Discussions](https://github.com/ienouali/react-storage-persist/discussions)
-- 📖 [Documentation](https://react-storage-persist.dev)
+- 📖 [Documentation](https://react-storage-persist.vercel.app/)
 
 ---
 
 <div align="center">
-Made with ❤️ by <a href="https://github.com/ienouali">ienouali</a>
+Made with ❤️ by <a href="https://ienouali.com/">ienouali</a>
 </div>
