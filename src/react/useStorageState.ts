@@ -18,6 +18,7 @@ export function useStorageState<T = any>(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<StorageError | null>(null);
   const isMountedRef = useRef(true);
+  const defaultValueRef = useRef(defaultValue);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -33,7 +34,7 @@ export function useStorageState<T = any>(
     setError(null);
 
     try {
-      const value = await storage.get<T>(key, defaultValue);
+      const value = await storage.get<T>(key, defaultValueRef.current);
       if (isMountedRef.current) {
         setState(value as T);
       }
@@ -46,11 +47,35 @@ export function useStorageState<T = any>(
         setLoading(false);
       }
     }
-  }, [key, defaultValue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
 
   useEffect(() => {
-    sync();
-  }, [sync]);
+    let cancelled = false;
+
+    const load = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const value = await storage.get<T>(key, defaultValueRef.current);
+        if (!cancelled) {
+          setState(value as T);
+          setLoading(false);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err as StorageError);
+          setLoading(false);
+        }
+      }
+    };
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
 
   useEffect(() => {
     const unsubscribe = storage.subscribe(key, (event) => {
