@@ -1,0 +1,35 @@
+.idea
+*.iml
+out
+gen
+# .gitignore
+node_modules
+website/node_modules
+website/.next
+dist
+coverage
+.vitest
+*.log
+.DS_Store
+.env
+.env.local
+.cache
+
+# Testing
+test-results/
+playwright-report/
+playwright/.cache/
+
+# IDE
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea
+.changeset
+.vscode/*
+# NPM
+.npmrc
+
+# Build
+*.tsbuildinfo
