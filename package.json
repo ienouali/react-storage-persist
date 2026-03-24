@@ -1,6 +1,6 @@
 {
   "name": "react-storage-persist",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Persistent state management for React. Store data reliably across sessions with automatic fallbacks, built-in TTL, and seamless TypeScript support",
   "author": "armada",
   "license": "MIT",
