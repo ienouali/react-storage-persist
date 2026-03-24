@@ -7,24 +7,24 @@
 
 A comprehensive, type-safe browser storage management library for React and TypeScript. Handle localStorage, sessionStorage, and IndexedDB with a unified API, automatic fallbacks, TTL support, and powerful React hooks.
 
-## ✨ Features
+## Features
 
-- 🎯 **Unified API** - Single interface for localStorage, sessionStorage, IndexedDB, and in-memory storage
-- 🔄 **Automatic Fallbacks** - Graceful degradation when storage is unavailable or blocked
-- ⏱️ **TTL Support** - Built-in expiration with automatic cleanup
-- 🎨 **React Hooks** - First-class React integration with intuitive hooks
-- 🔒 **Type-Safe** - Full TypeScript support with intelligent type inference
-- 🔐 **Encryption** - Optional encryption layer for sensitive data
-- 📦 **Namespacing** - Prefix/suffix support to avoid key collisions
-- 🔔 **Event System** - Subscribe to storage changes across tabs
-- 🎭 **Middleware** - Extensible plugin system for custom functionality
-- 🪶 **Lightweight** - Tree-shakeable and optimized for minimal bundle size
-- 🧪 **Well-Tested** - Comprehensive test coverage with Vitest and Playwright
-- 🌐 **SSR Safe** - Works seamlessly with Next.js and other SSR frameworks
+- **Unified API** - Single interface for localStorage, sessionStorage, IndexedDB, and in-memory storage
+- **Automatic Fallbacks** - Graceful degradation when storage is unavailable or blocked
+- **TTL Support** - Built-in expiration with automatic cleanup
+- **React Hooks** - First-class React integration with intuitive hooks
+- **Type-Safe** - Full TypeScript support with intelligent type inference
+- **Encryption** - Optional encryption layer for sensitive data
+- **Namespacing** - Prefix/suffix support to avoid key collisions
+- **Event System** - Subscribe to storage changes across tabs
+- **Middleware** - Extensible plugin system for custom functionality
+- **Lightweight** - Tree-shakeable and optimized for minimal bundle size
+- **Well-Tested** - Comprehensive test coverage with Vitest and Playwright
+- **SSR Safe** - Works seamlessly with Next.js and other SSR frameworks
 
 ---
 
-## 📦 Installation
+## Installation
 
 ```bash
 npm install react-storage-persist
@@ -40,7 +40,7 @@ pnpm add react-storage-persist
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Basic Hook Usage
 
@@ -89,23 +89,23 @@ const keys = await storage.keys();
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 ### Table of Contents
 
-- [Core Concepts](#-core-concepts)
-- [Storage Engines](#-storage-engines)
-- [React Hooks](#-react-hooks)
-- [Configuration Options](#%EF%B8%8F-configuration-options)
-- [Middleware & Plugins](#-middleware--plugins)
-- [Event System](#-event-system)
-- [TypeScript Usage](#-typescript-usage)
-- [Advanced Examples](#-advanced-examples)
-- [API Reference](#-api-reference)
+- [Core Concepts](#core-concepts)
+- [Storage Engines](#storage-engines)
+- [React Hooks](#react-hooks)
+- [Configuration Options](#configuration-options)
+- [Middleware & Plugins](#middleware--plugins)
+- [Event System](#event-system)
+- [TypeScript Usage](#typescript-usage)
+- [Advanced Examples](#advanced-examples)
+- [API Reference](#api-reference)
 
 ---
 
-## 🎯 Core Concepts
+## Core Concepts
 
 ### Storage Engines
 
@@ -129,7 +129,7 @@ const storage = createStorage({
 
 ---
 
-## 🗄️ Storage Engines
+## Storage Engines
 
 ### LocalStorage
 
@@ -183,7 +183,7 @@ const storage = createStorage({ engine: 'memory' });
 
 ---
 
-## 🪝 React Hooks
+## React Hooks
 
 ### `useStorage`
 
@@ -302,7 +302,7 @@ function ComponentB() {
 
 ---
 
-## ⚙️ Configuration Options
+## Configuration Options
 
 ### Storage Configuration
 
@@ -355,7 +355,7 @@ await storage.set('session', userData, { ttl: 3600 }); // 1 hour
 
 ---
 
-## 🔌 Middleware & Plugins
+## Middleware & Plugins
 
 ### Using Middleware
 
@@ -397,7 +397,7 @@ storage.use(logger);
 
 ---
 
-## 🔔 Event System
+## Event System
 
 ### Subscribe to Changes
 
@@ -446,7 +446,7 @@ function Example() {
 
 ---
 
-## 📘 TypeScript Usage
+## TypeScript Usage
 
 ### Type-Safe Storage
 
@@ -494,7 +494,7 @@ function Example() {
 
 ---
 
-## 🎓 Advanced Examples
+## Advanced Examples
 
 ### Form State Persistence
 
@@ -578,7 +578,7 @@ function ShoppingCart() {
       <ul>
         {cart.map((item) => (
           <li key={item.id}>
-            {item.name} × {item.quantity} = ${item.price * item.quantity}
+            {item.name} x {item.quantity} = ${item.price * item.quantity}
           </li>
         ))}
       </ul>
@@ -652,7 +652,7 @@ function DataManager() {
 
 ---
 
-## 📖 API Reference
+## API Reference
 
 ### Core Storage API
 
@@ -720,7 +720,7 @@ Listen to storage change events.
 
 ---
 
-## 🧪 Testing
+## Testing
 
 The library includes comprehensive test coverage:
 
@@ -762,7 +762,7 @@ test('persists user input', async () => {
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details.
 
@@ -785,26 +785,26 @@ npm run build
 
 ---
 
-## 📄 License
+## License
 
 MIT © [ienouali](https://github.com/ienouali)
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 Inspired by libraries like [localforage](https://github.com/localForage/localForage), [zustand](https://github.com/pmndrs/zustand), and [jotai](https://github.com/pmndrs/jotai).
 
 ---
 
-## 📞 Support
+## Support
 
-- 📫 [Report Issues](https://github.com/ienouali/react-storage-persist/issues)
-- 💬 [Discussions](https://github.com/ienouali/react-storage-persist/discussions)
-- 📖 [Documentation](https://react-storage-persist.vercel.app/)
+- [Report Issues](https://github.com/ienouali/react-storage-persist/issues)
+- [Discussions](https://github.com/ienouali/react-storage-persist/discussions)
+- [Documentation](https://react-storage-persist.vercel.app/)
 
 ---
 
 <div align="center">
-Made with ❤️ by <a href="https://ienouali.com/">ienouali</a>
+Made with love by <a href="https://ienouali.com/">ienouali</a>
 </div>
