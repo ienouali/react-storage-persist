@@ -1,0 +1,1 @@
+export { useStorageInstance } from './StorageContext';

@@ -2,10 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import {
-  Code2,
-  Database,
-  Zap,
-  Shield,
   Copy,
   Check,
   Github,
@@ -13,11 +9,7 @@ import {
   Globe,
   Menu,
   X,
-  Lock,
-  Layers,
-  Radio,
-  Cog,
-  BookOpen,
+  ExternalLink,
 } from 'lucide-react';
 
 const NAVIGATION = [
@@ -57,8 +49,16 @@ const NAVIGATION = [
     ],
   },
   {
+    title: 'React Context',
+    items: [
+      { id: 'storage-provider', label: 'StorageProvider' },
+      { id: 'use-storage-context', label: 'useStorageContext' },
+    ],
+  },
+  {
     title: 'Advanced',
     items: [
+      { id: 'batch-operations', label: 'Batch Operations' },
       { id: 'config-options', label: 'Configuration' },
       { id: 'middleware', label: 'Middleware & Plugins' },
       { id: 'event-system', label: 'Event System' },
@@ -170,7 +170,6 @@ export default function Home() {
         }`}
       >
         <div className="flex h-16 items-center px-6 border-b border-border">
-          <Database className="mr-2 h-6 w-6 text-primary" />
           <span className="font-bold text-lg tracking-tight">react-storage-persist</span>
         </div>
         <nav className="p-4 space-y-8 overflow-y-auto h-[calc(100vh-4rem)]">
@@ -210,7 +209,6 @@ export default function Home() {
         <header className="sticky top-0 z-40 lg:hidden border-b border-border bg-background/95 backdrop-blur">
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-2">
-              <Database className="h-5 w-5 text-primary" />
               <span className="font-bold text-sm">react-storage-persist</span>
             </div>
             <button
@@ -233,6 +231,38 @@ export default function Home() {
               Persistent state management for React. Store data reliably across sessions with
               automatic fallbacks, built-in TTL, and seamless TypeScript support.
             </p>
+            <div className="flex flex-wrap gap-2">
+              <a href="https://www.npmjs.com/package/react-storage-persist" target="_blank" rel="noopener noreferrer">
+                <img src="https://badge.fury.io/js/react-storage-persist.svg" alt="npm version" />
+              </a>
+              <a href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener noreferrer">
+                <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License" />
+              </a>
+              <a href="https://www.typescriptlang.org/" target="_blank" rel="noopener noreferrer">
+                <img src="https://img.shields.io/badge/TypeScript-5.3-blue.svg" alt="TypeScript" />
+              </a>
+              <a href="https://bundlephobia.com/package/react-storage-persist" target="_blank" rel="noopener noreferrer">
+                <img src="https://img.shields.io/bundlephobia/minzip/react-storage-persist" alt="Bundle Size" />
+              </a>
+            </div>
+            <div className="flex flex-wrap gap-3 pt-2">
+              <a
+                href="https://github.com/ienouali/react-storage-persist"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-card hover:bg-accent transition-colors text-sm font-medium"
+              >
+                <Github className="h-4 w-4" /> GitHub
+              </a>
+              <a
+                href="https://www.npmjs.com/package/react-storage-persist"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-medium"
+              >
+                <ExternalLink className="h-4 w-4" /> View on npm
+              </a>
+            </div>
           </section>
 
           {/* Features */}
@@ -240,30 +270,23 @@ export default function Home() {
             <h2 className="text-3xl font-bold tracking-tight">Features</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[
-                {
-                  icon: Zap,
-                  title: 'Unified API',
-                  desc: 'Single interface for all storage engines',
-                },
-                {
-                  icon: Radio,
-                  title: 'Automatic Fallbacks',
-                  desc: 'Graceful degradation when unavailable',
-                },
-                { icon: Clock, title: 'TTL Support', desc: 'Built-in expiration with cleanup' },
-                { icon: Code2, title: 'React Hooks', desc: 'First-class React integration' },
-                { icon: Shield, title: 'Type-Safe', desc: 'Full TypeScript with type inference' },
-                { icon: Lock, title: 'Encryption', desc: 'Optional encryption for sensitive data' },
-                { icon: Layers, title: 'Namespacing', desc: 'Prefix/suffix support for keys' },
-                { icon: Radio, title: 'Event System', desc: 'Subscribe to storage changes' },
-                { icon: Cog, title: 'Middleware', desc: 'Extensible plugin system' },
-                { icon: BookOpen, title: 'Lightweight', desc: 'Tree-shakeable, optimized bundle' },
-              ].map(({ icon: Icon, title, desc }) => (
+                { title: 'Unified API', desc: 'Single interface for all storage engines' },
+                { title: 'Automatic Fallbacks', desc: 'Graceful degradation when unavailable' },
+                { title: 'TTL Support', desc: 'Built-in expiration with cleanup' },
+                { title: 'React Hooks', desc: 'First-class React integration' },
+                { title: 'Type-Safe', desc: 'Full TypeScript with type inference' },
+                { title: 'Encryption', desc: 'Optional encryption for sensitive data' },
+                { title: 'Namespacing', desc: 'Prefix/suffix support for keys' },
+                { title: 'Event System', desc: 'Subscribe to storage changes' },
+                { title: 'Middleware', desc: 'Extensible plugin system' },
+                { title: 'Lightweight', desc: 'Tree-shakeable, optimized bundle' },
+                { title: 'StorageProvider', desc: 'Configure storage once at the app root' },
+                { title: 'Batch Operations', desc: 'Read and write multiple keys at once' },
+              ].map(({ title, desc }) => (
                 <div
                   key={title}
                   className="p-4 rounded-lg border border-border bg-card/50 hover:bg-card transition-colors"
                 >
-                  <Icon className="h-5 w-5 text-primary mb-2" />
                   <h3 className="font-semibold text-sm">{title}</h3>
                   <p className="text-xs text-muted-foreground mt-1">{desc}</p>
                 </div>
@@ -273,7 +296,7 @@ export default function Home() {
 
           {/* Installation */}
           <section id="install" className="space-y-6 mb-20 scroll-mt-24">
-            <h2 className="text-3xl font-bold tracking-tight">📦 Installation</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Installation</h2>
             <CodeBlock
               code="npm install react-storage-persist"
               language="bash"
@@ -301,7 +324,7 @@ export default function Home() {
 
           {/* Quick Start */}
           <section id="quick-start" className="space-y-6 mb-20 scroll-mt-24">
-            <h2 className="text-3xl font-bold tracking-tight">🚀 Quick Start</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Quick Start</h2>
             <p className="text-muted-foreground">
               Get up and running in seconds with our React hooks.
             </p>
@@ -326,7 +349,7 @@ function MyComponent() {
           </section>
 
           {/* Core API */}
-          <section id="core-api" className="space-y-6 mb-20 scroll-mt-24">
+          <section id="core-api-usage" className="space-y-6 mb-20 scroll-mt-24">
             <h2 className="text-3xl font-bold tracking-tight">Core API Usage</h2>
             <CodeBlock
               code={`import { createStorage } from 'react-storage-persist/core';
@@ -362,7 +385,7 @@ const keys = await storage.keys();`}
 
           {/* Storage Engines Overview */}
           <section id="storage-engines" className="space-y-6 mb-20 scroll-mt-24">
-            <h2 className="text-3xl font-bold tracking-tight">🗄️ Storage Engines</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Storage Engines</h2>
             <p className="text-muted-foreground">
               The library supports multiple storage backends with automatic fallbacks.
             </p>
@@ -493,7 +516,7 @@ const temp = await storage.get('temp');`}
 
           {/* React Hooks */}
           <section id="use-storage" className="space-y-6 mb-20 scroll-mt-24">
-            <h2 className="text-3xl font-bold tracking-tight">🪝 React Hooks</h2>
+            <h2 className="text-3xl font-bold tracking-tight">React Hooks</h2>
             <h3 className="text-2xl font-bold">useStorage</h3>
             <p className="text-muted-foreground">
               Primary hook for persisting state to storage with automatic syncing.
@@ -630,18 +653,196 @@ function ComponentB() {
           {/* useStorageEvent */}
           <section id="use-storage-event" className="space-y-6 mb-20 scroll-mt-24">
             <h3 className="text-2xl font-bold">useStorageEvent</h3>
-            <p className="text-muted-foreground">Listen to storage change events.</p>
+            <p className="text-muted-foreground">
+              Subscribe to storage change events for a specific key. Automatically unsubscribes when the component unmounts and always uses the latest callback without re-subscribing.
+            </p>
             <CodeBlock
               code={`import { useStorageEvent } from 'react-storage-persist';
 
-function Example() {
-  useStorageEvent('user', (event) => {
-    console.log('User data changed!', event.newValue);
+function Cart() {
+  useStorageEvent('cart', (event) => {
+    console.log('Cart changed:', event.newValue);
+    console.log('Previous cart:', event.oldValue);
   });
 
-  return <div>Listening to user changes...</div>;
+  return <div>Watching cart changes...</div>;
 }`}
               id="use-storage-event-example"
+              copyToClipboard={copyToClipboard}
+              copiedCode={copiedCode}
+            />
+            <p className="text-muted-foreground text-sm">Practical example — show a toast when another tab updates the cart:</p>
+            <CodeBlock
+              code={`import { useStorageEvent } from 'react-storage-persist';
+
+function CartWatcher() {
+  useStorageEvent('cart', (event) => {
+    if (event.type === 'set') {
+      showToast('Cart updated in another tab');
+    }
+  });
+
+  return null;
+}`}
+              id="use-storage-event-toast"
+              copyToClipboard={copyToClipboard}
+              copiedCode={copiedCode}
+            />
+          </section>
+
+          {/* Divider */}
+          <div className="h-px bg-border my-20" />
+
+          {/* StorageProvider */}
+          <section id="storage-provider" className="space-y-6 mb-20 scroll-mt-24">
+            <h2 className="text-3xl font-bold tracking-tight">React Context</h2>
+            <h3 className="text-2xl font-bold">StorageProvider</h3>
+            <p className="text-muted-foreground">
+              Configure a storage instance once at the app root and share it across all hooks automatically. All hooks inside the provider use the configured storage — no need to pass it manually.
+            </p>
+            <CodeBlock
+              code={`import { StorageProvider } from 'react-storage-persist';
+
+function App() {
+  return (
+    <StorageProvider config={{ engine: 'localStorage', prefix: 'myapp_' }}>
+      <Router />
+    </StorageProvider>
+  );
+}`}
+              id="storage-provider-basic"
+              copyToClipboard={copyToClipboard}
+              copiedCode={copiedCode}
+            />
+            <p className="text-muted-foreground text-sm">All hooks automatically pick up the provider config:</p>
+            <CodeBlock
+              code={`// No config needed — hooks use the StorageProvider settings
+import { useStorage, useStorageState } from 'react-storage-persist';
+
+function Settings() {
+  const [theme, setTheme] = useStorage('theme', 'light');
+  return <button onClick={() => setTheme('dark')}>Dark mode</button>;
+}
+
+function Profile() {
+  const [user, setUser, { loading }] = useStorageState('user', null);
+  if (loading) return <p>Loading...</p>;
+  return <p>{user?.name}</p>;
+}`}
+              id="storage-provider-hooks"
+              copyToClipboard={copyToClipboard}
+              copiedCode={copiedCode}
+            />
+            <p className="text-muted-foreground text-sm">Use different storage configs for different parts of your app:</p>
+            <CodeBlock
+              code={`function App() {
+  return (
+    <>
+      {/* User preferences stored in localStorage */}
+      <StorageProvider config={{ engine: 'localStorage', prefix: 'prefs_' }}>
+        <PreferencesPanel />
+      </StorageProvider>
+
+      {/* Session data stored in sessionStorage */}
+      <StorageProvider config={{ engine: 'sessionStorage', prefix: 'session_' }}>
+        <CheckoutFlow />
+      </StorageProvider>
+    </>
+  );
+}`}
+              id="storage-provider-multiple"
+              copyToClipboard={copyToClipboard}
+              copiedCode={copiedCode}
+            />
+          </section>
+
+          {/* useStorageContext */}
+          <section id="use-storage-context" className="space-y-6 mb-20 scroll-mt-24">
+            <h3 className="text-2xl font-bold">useStorageContext</h3>
+            <p className="text-muted-foreground">
+              Access the storage instance directly from the nearest <code className="text-primary text-sm font-mono">StorageProvider</code>. Useful when you need to call storage methods imperatively.
+            </p>
+            <CodeBlock
+              code={`import { useStorageContext } from 'react-storage-persist';
+
+function ClearButton() {
+  const storage = useStorageContext();
+
+  const handleClear = async () => {
+    await storage.clear();
+    console.log('All storage cleared');
+  };
+
+  return <button onClick={handleClear}>Clear all data</button>;
+}`}
+              id="use-storage-context-example"
+              copyToClipboard={copyToClipboard}
+              copiedCode={copiedCode}
+            />
+          </section>
+
+          {/* Divider */}
+          <div className="h-px bg-border my-20" />
+
+          {/* Batch Operations */}
+          <section id="batch-operations" className="space-y-6 mb-20 scroll-mt-24">
+            <h2 className="text-3xl font-bold tracking-tight">Batch Operations</h2>
+            <p className="text-muted-foreground">
+              Read, write, and remove multiple keys in a single call. All batch operations run in parallel for maximum performance.
+            </p>
+            <h3 className="text-xl font-semibold mt-4">getMany</h3>
+            <CodeBlock
+              code={`import { createStorage } from 'react-storage-persist/core';
+
+const storage = createStorage({ engine: 'localStorage' });
+
+const result = await storage.getMany(['user', 'settings', 'cart']);
+// { user: { name: 'John' }, settings: { theme: 'dark' }, cart: null }`}
+              id="batch-get-many"
+              copyToClipboard={copyToClipboard}
+              copiedCode={copiedCode}
+            />
+            <h3 className="text-xl font-semibold mt-4">setMany</h3>
+            <CodeBlock
+              code={`await storage.setMany({
+  user: { name: 'John', email: 'john@example.com' },
+  settings: { theme: 'dark', language: 'en' },
+  lastVisit: Date.now(),
+});`}
+              id="batch-set-many"
+              copyToClipboard={copyToClipboard}
+              copiedCode={copiedCode}
+            />
+            <h3 className="text-xl font-semibold mt-4">removeMany</h3>
+            <CodeBlock
+              code={`// Remove all session-related keys at once
+await storage.removeMany(['authToken', 'sessionId', 'tempData']);`}
+              id="batch-remove-many"
+              copyToClipboard={copyToClipboard}
+              copiedCode={copiedCode}
+            />
+            <p className="text-muted-foreground text-sm">Practical example — initialize app state from storage in one call:</p>
+            <CodeBlock
+              code={`import { useEffect, useState } from 'react';
+import { createStorage } from 'react-storage-persist/core';
+
+const storage = createStorage({ engine: 'localStorage', prefix: 'app_' });
+
+function App() {
+  const [appState, setAppState] = useState(null);
+
+  useEffect(() => {
+    const init = async () => {
+      const data = await storage.getMany(['user', 'settings', 'cart']);
+      setAppState(data);
+    };
+    init();
+  }, []);
+
+  if (!appState) return <p>Loading...</p>;
+  return <Main user={appState.user} settings={appState.settings} />;
+}`}
+              id="batch-practical"
               copyToClipboard={copyToClipboard}
               copiedCode={copiedCode}
             />
@@ -652,7 +853,7 @@ function Example() {
 
           {/* Configuration */}
           <section id="config-options" className="space-y-6 mb-20 scroll-mt-24">
-            <h2 className="text-3xl font-bold tracking-tight">⚙️ Configuration</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Configuration</h2>
             <CodeBlock
               code={`interface StorageConfig {
   engine?: 'localStorage' | 'sessionStorage' | 'indexedDB' | 'memory';
@@ -695,19 +896,19 @@ await storage.set('session', userData, { ttl: 3600 }); // 1 hour`}
 
           {/* Middleware */}
           <section id="middleware" className="space-y-6 mb-20 scroll-mt-24">
-            <h2 className="text-3xl font-bold tracking-tight">🔌 Middleware & Plugins</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Middleware & Plugins</h2>
             <h3 className="text-2xl font-bold">Using Middleware</h3>
             <CodeBlock
               code={`import { createStorage } from 'react-storage-persist/core';
-import { encryption, compression } from 'react-storage-persist/middleware';
+import { encryptionMiddleware, compressionMiddleware } from 'react-storage-persist/middleware';
 
 const storage = createStorage({ engine: 'localStorage' });
 
 // Add encryption middleware
-storage.use(encryption({ key: 'your-secret-key' }));
+storage.use(encryptionMiddleware({ key: 'your-secret-key' }));
 
 // Add compression middleware
-storage.use(compression({ threshold: 1024 })); // Compress if > 1KB`}
+storage.use(compressionMiddleware({ threshold: 1024 })); // Compress if > 1KB`}
               id="middleware-usage"
               copyToClipboard={copyToClipboard}
               copiedCode={copiedCode}
@@ -740,7 +941,7 @@ storage.use(logger);`}
 
           {/* Event System */}
           <section id="event-system" className="space-y-6 mb-20 scroll-mt-24">
-            <h2 className="text-3xl font-bold tracking-tight">🔔 Event System</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Event System</h2>
             <h3 className="text-2xl font-bold">Subscribe to Changes</h3>
             <CodeBlock
               code={`// Subscribe to specific key
@@ -763,7 +964,7 @@ unsubscribe();`}
 
           {/* TypeScript */}
           <section id="typescript" className="space-y-6 mb-20 scroll-mt-24">
-            <h2 className="text-3xl font-bold tracking-tight">📘 TypeScript Usage</h2>
+            <h2 className="text-3xl font-bold tracking-tight">TypeScript Usage</h2>
             <h3 className="text-2xl font-bold">Type-Safe Storage</h3>
             <CodeBlock
               code={`interface User {
@@ -817,7 +1018,7 @@ function Example() {
 
           {/* Examples */}
           <section id="form-persistence" className="space-y-6 mb-20 scroll-mt-24">
-            <h2 className="text-3xl font-bold tracking-tight">🎓 Advanced Examples</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Advanced Examples</h2>
             <h3 className="text-2xl font-bold">Form State Persistence</h3>
             <CodeBlock
               code={`import { useStorage } from 'react-storage-persist';
@@ -993,7 +1194,7 @@ function DataManager() {
 
           {/* Core API Reference */}
           <section id="core-api" className="space-y-6 mb-20 scroll-mt-24">
-            <h2 className="text-3xl font-bold tracking-tight">📖 API Reference</h2>
+            <h2 className="text-3xl font-bold tracking-tight">API Reference</h2>
             <h3 className="text-2xl font-bold">Core Storage API</h3>
             <div className="space-y-4">
               {[
@@ -1028,6 +1229,18 @@ function DataManager() {
                   name: 'use(middleware: Middleware): void',
                   desc: 'Add middleware to the storage instance.',
                 },
+                {
+                  name: 'getMany<T>(keys: string[]): Promise<BatchGetResult<T>>',
+                  desc: 'Retrieve multiple keys at once. Returns a keyed object with values or null for missing keys.',
+                },
+                {
+                  name: 'setMany(items: BatchSetItems, options?: StorageOptions): Promise<void>',
+                  desc: 'Set multiple key/value pairs in a single parallel call.',
+                },
+                {
+                  name: 'removeMany(keys: string[]): Promise<void>',
+                  desc: 'Remove multiple keys in a single parallel call.',
+                },
               ].map(({ name, desc }) => (
                 <div key={name} className="border border-border rounded-lg p-4 bg-card/50">
                   <code className="text-sm font-mono text-primary">{name}</code>
@@ -1056,11 +1269,15 @@ function DataManager() {
                 },
                 {
                   name: 'useStorageSync<T>(key, defaultValue, options?): [T, (value: T) => void]',
-                  desc: 'Synchronize state across components and tabs.',
+                  desc: 'Synchronize state across components and tabs in real time.',
                 },
                 {
-                  name: 'useStorageEvent(key, callback): void',
-                  desc: 'Listen to storage change events.',
+                  name: 'useStorageEvent(key: string, callback: (event) => void): void',
+                  desc: 'Subscribe to storage change events for a key. Auto-cleans on unmount.',
+                },
+                {
+                  name: 'useStorageContext(): Storage',
+                  desc: 'Access the storage instance from the nearest StorageProvider.',
                 },
               ].map(({ name, desc }) => (
                 <div key={name} className="border border-border rounded-lg p-4 bg-card/50">
@@ -1076,7 +1293,7 @@ function DataManager() {
 
           {/* Testing */}
           <section id="testing" className="space-y-6 mb-20 scroll-mt-24">
-            <h2 className="text-3xl font-bold tracking-tight">🧪 Testing</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Testing</h2>
             <p className="text-muted-foreground">
               The library includes comprehensive test coverage.
             </p>
@@ -1124,7 +1341,7 @@ test('persists user input', async () => {
 
           {/* Contributing */}
           <section id="contributing" className="space-y-6 mb-20 scroll-mt-24">
-            <h2 className="text-3xl font-bold tracking-tight">🤝 Contributing</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Contributing</h2>
             <p className="text-muted-foreground">
               Contributions are welcome! Here's how to get started:
             </p>
@@ -1190,7 +1407,7 @@ npm run build`}
               </div>
             </div>
             <div className="bg-card border border-border rounded-lg p-6 space-y-2">
-              <p className="text-sm font-semibold text-foreground">📄 License</p>
+              <p className="text-sm font-semibold text-foreground">License</p>
               <p className="text-sm text-muted-foreground">
                 MIT © ienouali. This library is open source and available for everyone to use.
               </p>
@@ -1217,4 +1434,3 @@ npm run build`}
   );
 }
 
-const Clock = Database;

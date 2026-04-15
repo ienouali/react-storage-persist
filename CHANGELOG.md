@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-04-13
+
+### Added
+
+#### Batch Operations
+- `storage.getMany(keys)` — retrieve multiple keys at once, returns a keyed result object
+- `storage.setMany(items, options?)` — set multiple key/value pairs in a single call
+- `storage.removeMany(keys)` — remove multiple keys at once
+- Functional helpers `getMany`, `setMany`, `removeMany` exported from `react-storage-persist/core`
+- New types `BatchGetResult` and `BatchSetItems` exported from the types package
+
+#### React Context
+- `StorageProvider` — configure a storage instance at the app root and share it across all hooks
+- `useStorageContext` — access the storage instance provided by `StorageProvider`
+- All hooks (`useStorage`, `useStorageState`, `useStorageReducer`, `useStorageSync`) now automatically use the nearest `StorageProvider` when available, falling back to the global default instance
+
+#### New Hook
+- `useStorageEvent(key, callback)` — subscribe to storage change events for a specific key inside a React component, with automatic cleanup on unmount and always-fresh callback reference
+
+---
+
 ## [1.0.0] - 2025-01-26
 
 ### Added

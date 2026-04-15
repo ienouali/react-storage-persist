@@ -6,6 +6,8 @@ import type {
   IStorageEngine,
   Middleware,
   StorageEventType,
+  BatchGetResult,
+  BatchSetItems,
 } from '../types';
 
 import { StorageError, StorageErrorCode } from '../types/errors';
@@ -168,6 +170,32 @@ export class Storage {
   async has(key: string): Promise<boolean> {
     const value = await this.get(key);
     return value !== null;
+  }
+
+  /**
+   * Get multiple items at once
+   */
+  async getMany<T = any>(keys: string[]): Promise<BatchGetResult<T>> {
+    const entries = await Promise.all(
+      keys.map(async (key) => [key, await this.get<T>(key)] as [string, T | null])
+    );
+    return Object.fromEntries(entries);
+  }
+
+  /**
+   * Set multiple items at once
+   */
+  async setMany(items: BatchSetItems, options?: StorageOptions): Promise<void> {
+    await Promise.all(
+      Object.entries(items).map(([key, value]) => this.set(key, value, options))
+    );
+  }
+
+  /**
+   * Remove multiple items at once
+   */
+  async removeMany(keys: string[]): Promise<void> {
+    await Promise.all(keys.map((key) => this.remove(key)));
   }
 
   /**

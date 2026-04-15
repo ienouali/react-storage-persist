@@ -1,6 +1,6 @@
 import type { Reducer, Dispatch } from 'react';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { getDefaultStorage } from '../core';
+import { useStorageInstance } from './useStorageInstance';
 import type { StorageOptions } from '../types';
 
 export function useStorageReducer<S, A>(
@@ -9,7 +9,7 @@ export function useStorageReducer<S, A>(
   initialState: S,
   options?: StorageOptions
 ): [S, Dispatch<A>] {
-  const storage = getDefaultStorage();
+  const storage = useStorageInstance();
   const [state, setState] = useState<S>(initialState);
   const isMountedRef = useRef(true);
   const isInitializedRef = useRef(false);

@@ -48,6 +48,14 @@ export interface StorageChangeEvent<T = any> {
   timestamp: number;
 }
 
+export interface BatchGetResult<T = any> {
+  [key: string]: T | null;
+}
+
+export interface BatchSetItems {
+  [key: string]: any;
+}
+
 export interface Middleware {
   name: string;
   beforeSet?: <T>(key: string, value: T, options?: StorageOptions) => T | Promise<T>;

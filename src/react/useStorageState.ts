@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { getDefaultStorage } from '../core';
+import { useStorageInstance } from './useStorageInstance';
 import type { StorageOptions, StorageError } from '../types';
 
 export interface UseStorageStateResult {
@@ -13,7 +13,7 @@ export function useStorageState<T = any>(
   defaultValue: T,
   options?: StorageOptions
 ): [T, (value: T | ((prev: T) => T)) => Promise<void>, UseStorageStateResult] {
-  const storage = getDefaultStorage();
+  const storage = useStorageInstance();
   const [state, setState] = useState<T>(defaultValue);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<StorageError | null>(null);

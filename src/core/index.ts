@@ -1,5 +1,5 @@
 import { Storage } from './storage';
-import type { StorageConfig, StorageOptions, StorageChangeEvent } from '../types';
+import type { StorageConfig, StorageOptions, StorageChangeEvent, BatchGetResult, BatchSetItems } from '../types';
 
 let defaultInstance: Storage | null = null;
 
@@ -43,5 +43,14 @@ export const subscribe = (
   keyOrCallback: string | ((event: StorageChangeEvent) => void),
   callback?: (event: StorageChangeEvent) => void
 ): (() => void) => getDefaultStorage().subscribe(keyOrCallback, callback);
+
+export const getMany = <T = any>(keys: string[]): Promise<BatchGetResult<T>> =>
+  getDefaultStorage().getMany<T>(keys);
+
+export const setMany = (items: BatchSetItems, options?: StorageOptions): Promise<void> =>
+  getDefaultStorage().setMany(items, options);
+
+export const removeMany = (keys: string[]): Promise<void> =>
+  getDefaultStorage().removeMany(keys);
 
 export { Storage } from './storage';

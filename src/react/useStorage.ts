@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { getDefaultStorage } from '../core';
+import { useStorageInstance } from './useStorageInstance';
 import type { StorageOptions } from '../types';
 
 export function useStorage<T = any>(
@@ -7,7 +7,7 @@ export function useStorage<T = any>(
   defaultValue: T,
   options?: StorageOptions
 ): [T, (value: T | ((prev: T) => T)) => Promise<void>] {
-  const storage = getDefaultStorage();
+  const storage = useStorageInstance();
   const [state, setState] = useState<T>(defaultValue);
   const [isInitialized, setIsInitialized] = useState(false);
   const isMountedRef = useRef(true);
