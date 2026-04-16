@@ -2,10 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useStorageInstance } from './useStorageInstance';
 import type { StorageChangeEvent } from '../types';
 
-export function useStorageEvent(
-  key: string,
-  callback: (event: StorageChangeEvent) => void
-): void {
+export function useStorageEvent(key: string, callback: (event: StorageChangeEvent) => void): void {
   const storage = useStorageInstance();
   const callbackRef = useRef(callback);
 

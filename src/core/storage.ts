@@ -186,9 +186,7 @@ export class Storage {
    * Set multiple items at once
    */
   async setMany(items: BatchSetItems, options?: StorageOptions): Promise<void> {
-    await Promise.all(
-      Object.entries(items).map(([key, value]) => this.set(key, value, options))
-    );
+    await Promise.all(Object.entries(items).map(([key, value]) => this.set(key, value, options)));
   }
 
   /**
