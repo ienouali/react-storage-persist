@@ -46,6 +46,7 @@ const NAVIGATION = [
       { id: 'use-storage-reducer', label: 'useStorageReducer' },
       { id: 'use-storage-sync', label: 'useStorageSync' },
       { id: 'use-storage-event', label: 'useStorageEvent' },
+      { id: 'use-storage-list', label: 'useStorageList' },
     ],
   },
   {
@@ -282,6 +283,7 @@ export default function Home() {
                 { title: 'Lightweight', desc: 'Tree-shakeable, optimized bundle' },
                 { title: 'StorageProvider', desc: 'Configure storage once at the app root' },
                 { title: 'Batch Operations', desc: 'Read and write multiple keys at once' },
+                { title: 'useStorageList', desc: 'Persist arrays with push, remove, filter & more' },
               ].map(({ title, desc }) => (
                 <div
                   key={title}
@@ -685,6 +687,120 @@ function CartWatcher() {
   return null;
 }`}
               id="use-storage-event-toast"
+              copyToClipboard={copyToClipboard}
+              copiedCode={copiedCode}
+            />
+          </section>
+
+          {/* useStorageList */}
+          <section id="use-storage-list" className="space-y-6 mb-20 scroll-mt-24">
+            <h3 className="text-2xl font-bold">useStorageList</h3>
+            <p className="text-muted-foreground">
+              Manage a persisted array with built-in helper actions. Instead of manually maintaining array state and syncing it to storage, <code className="font-mono text-sm bg-muted px-1 rounded">useStorageList</code> gives you a ready-to-use action set for common list operations.
+            </p>
+            <CodeBlock
+              code={`import { useStorageList } from 'react-storage-persist';
+
+function TodoList() {
+  const [todos, { push, removeAt, update, clear }] = useStorageList<string>('todos', []);
+
+  return (
+    <div>
+      <button onClick={() => push('New task')}>Add task</button>
+      <ul>
+        {todos.map((todo, i) => (
+          <li key={i}>
+            {todo}
+            <button onClick={() => removeAt(i)}>Delete</button>
+          </li>
+        ))}
+      </ul>
+      <button onClick={clear}>Clear all</button>
+    </div>
+  );
+}`}
+              id="use-storage-list-basic"
+              copyToClipboard={copyToClipboard}
+              copiedCode={copiedCode}
+            />
+
+            <p className="text-muted-foreground text-sm font-medium">All available actions:</p>
+            <CodeBlock
+              code={`const [items, actions] = useStorageList<T>(key, defaultValue?, options?);
+
+// actions:
+actions.push(item)                // append to end
+actions.removeAt(index)           // remove by index
+actions.update(index, item)       // replace item at index
+actions.set(newItems)             // replace the entire list
+actions.clear()                   // empty the list
+actions.insert(index, item)       // insert at position
+actions.move(fromIndex, toIndex)  // reorder items
+actions.filter(predicate)         // keep only matching items`}
+              id="use-storage-list-actions"
+              copyToClipboard={copyToClipboard}
+              copiedCode={copiedCode}
+            />
+
+            <p className="text-muted-foreground text-sm">Object items with TypeScript — a fully typed persistent task list:</p>
+            <CodeBlock
+              code={`import { useStorageList } from 'react-storage-persist';
+
+interface Task {
+  id: number;
+  text: string;
+  done: boolean;
+}
+
+function TaskManager() {
+  const [tasks, { push, removeAt, update, filter }] = useStorageList<Task>('tasks', []);
+
+  const addTask = (text: string) => push({ id: Date.now(), text, done: false });
+
+  const toggleTask = (index: number) =>
+    update(index, { ...tasks[index], done: !tasks[index].done });
+
+  const clearCompleted = () => filter((task) => !task.done);
+
+  return (
+    <ul>
+      {tasks.map((task, i) => (
+        <li key={task.id}>
+          <input type="checkbox" checked={task.done} onChange={() => toggleTask(i)} />
+          <span style={{ textDecoration: task.done ? 'line-through' : 'none' }}>
+            {task.text}
+          </span>
+          <button onClick={() => removeAt(i)}>Remove</button>
+        </li>
+      ))}
+      <button onClick={clearCompleted}>Clear completed</button>
+    </ul>
+  );
+}`}
+              id="use-storage-list-tasks"
+              copyToClipboard={copyToClipboard}
+              copiedCode={copiedCode}
+            />
+
+            <p className="text-muted-foreground text-sm">Works seamlessly with <code className="font-mono text-sm bg-muted px-1 rounded">StorageProvider</code> — the hook automatically uses the configured storage instance from context:</p>
+            <CodeBlock
+              code={`import { StorageProvider, useStorageList } from 'react-storage-persist';
+
+// Provider at app root
+function App() {
+  return (
+    <StorageProvider config={{ engine: 'indexedDB', prefix: 'app_' }}>
+      <ShoppingCart />
+    </StorageProvider>
+  );
+}
+
+// Hook picks up the IndexedDB engine automatically
+function ShoppingCart() {
+  const [cart, { push, removeAt, clear }] = useStorageList('cart', []);
+  // ...
+}`}
+              id="use-storage-list-provider"
               copyToClipboard={copyToClipboard}
               copiedCode={copiedCode}
             />
@@ -1274,6 +1390,10 @@ function DataManager() {
                 {
                   name: 'useStorageEvent(key: string, callback: (event) => void): void',
                   desc: 'Subscribe to storage change events for a key. Auto-cleans on unmount.',
+                },
+                {
+                  name: 'useStorageList<T>(key, defaultValue?, options?): [T[], UseStorageListActions<T>]',
+                  desc: 'Persist an array with built-in actions: push, removeAt, update, set, clear, insert, move, filter.',
                 },
                 {
                   name: 'useStorageContext(): Storage',

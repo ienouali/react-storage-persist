@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-04-21
+
+### Added
+
+#### New Hook
+- `useStorageList<T>(key, defaultValue?, options?)` — specialized hook for managing persistent array/list state with built-in mutating helpers:
+  - `push(item)` — append an item to the end
+  - `removeAt(index)` — remove item at a given index
+  - `update(index, item)` — replace item at a given index
+  - `set(items)` — replace the entire list
+  - `clear()` — empty the list
+  - `insert(index, item)` — insert item at a given index
+  - `move(fromIndex, toIndex)` — reorder items
+  - `filter(predicate)` — retain only items matching the predicate
+- New types `UseStorageListActions<T>` and `UseStorageListResult<T>` exported from the package
+- Hook automatically uses the nearest `StorageProvider` context if available, falling back to the global default instance
+
+---
+
 ## [1.1.0] - 2026-04-13
 
 ### Added
