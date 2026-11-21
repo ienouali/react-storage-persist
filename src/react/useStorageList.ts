@@ -73,9 +73,12 @@ export function useStorageList<T = any>(
   // Subscribe to external changes (cross-tab, StorageProvider, etc.)
   useEffect(() => {
     const unsubscribe = storage.subscribe(key, (event) => {
-      if (event.type === 'set' && isMountedRef.current) {
+      if (!isMountedRef.current) return;
+      if (event.type === 'set') {
         const incoming = event.newValue;
         setItems(Array.isArray(incoming) ? incoming : defaultValueRef.current);
+      } else if (event.type === 'remove') {
+        setItems(defaultValueRef.current);
       }
     });
 

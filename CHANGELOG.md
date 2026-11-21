@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - Unreleased
+
+### Fixed
+- Reading or removing an expired TTL entry recursed `get → remove → get` forever, freezing the page (also triggered by the 5-minute cleanup).
+- Cross-tab sync delivered the internal `{ value, metadata }` wrapper instead of the value, skipped `afterGet` middleware (e.g. decryption) and reported removals as `set` with `null`. Removals now emit `remove`, a `clear()` in another tab notifies key subscribers, and only events from the engine's own storage area are handled.
+- The window `storage` listener is removed on `destroy()` and is no longer registered for IndexedDB/memory engines.
+- `set()`/`remove()` no longer emit a spurious `get` event or run `afterGet` middleware as a side effect.
+- `afterGet` middleware now runs in reverse registration order, so stacked middleware (e.g. compression + encryption) round-trips correctly.
+- `encryptionMiddleware` no longer throws for objects, arrays, numbers or non-Latin-1 strings, and no longer corrupts unrelated strings that happen to be valid base64.
+- `compressionMiddleware` no longer corrupts values containing `x*N` patterns or throws on nested objects; it now uses native gzip/deflate via `CompressionStream` and only stores the compressed form when it is smaller.
+- `useStorage`, `useStorageState`, `useStorageList` and `useStorageReducer` reset to their default value when the key is removed.
+- `useStorageReducer` no longer writes state received from storage back to storage, which made tabs echo writes to each other indefinitely.
+
+### Added
+- `encryptionMiddleware({ algorithm: 'aes-gcm' })`: real AES-GCM encryption with a PBKDF2-derived key (`salt`, `iterations` options).
+- `compressionMiddleware({ algorithm })` accepts `'gzip' | 'deflate' | 'deflate-raw'`.
+- `EncryptionAlgorithm` and `CompressionAlgorithm` types.
+
+### Deprecated
+- `encryptionMiddleware` algorithms `'base64'` and `'simple-xor'` (obfuscation only; a one-time console warning is shown). The default will change to `'aes-gcm'` in the next major.
+- `compressionMiddleware` algorithm `'simple-rle'` (now treated as `'gzip'`).
+
+### Upgrade notes
+- Encrypted and compressed values are now stored inside a tagged envelope. Strings written by 1.2.0 with `base64`/`simple-xor` are still read. Values compressed by the old RLE scheme are returned as stored.
+- Custom middleware that relied on `afterGet` running in registration order must account for the reversed order.
+
+---
+
 ## [1.2.0] - 2026-04-21
 
 ### Added

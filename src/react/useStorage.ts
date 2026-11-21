@@ -12,6 +12,7 @@ export function useStorage<T = any>(
   const [isInitialized, setIsInitialized] = useState(false);
   const isMountedRef = useRef(true);
   const stateRef = useRef(state);
+  const defaultValueRef = useRef(defaultValue);
 
   useEffect(() => {
     stateRef.current = state;
@@ -54,8 +55,11 @@ export function useStorage<T = any>(
     if (!isInitialized) return;
 
     const unsubscribe = storage.subscribe(key, (event) => {
-      if (event.type === 'set' && isMountedRef.current) {
+      if (!isMountedRef.current) return;
+      if (event.type === 'set') {
         setState(event.newValue as T);
+      } else if (event.type === 'remove') {
+        setState(defaultValueRef.current);
       }
     });
 

@@ -361,16 +361,25 @@ await storage.set('session', userData, { ttl: 3600 }); // 1 hour
 
 ```typescript
 import { createStorage } from 'react-storage-persist/core';
-import { encryption, compression } from 'react-storage-persist/middleware';
+import { compressionMiddleware, encryptionMiddleware } from 'react-storage-persist/middleware';
 
 const storage = createStorage({ engine: 'localStorage' });
 
-// Add encryption middleware
-storage.use(encryption({ key: 'your-secret-key' }));
+// Compress values whose JSON is larger than 1 KB (native gzip via CompressionStream)
+storage.use(compressionMiddleware({ threshold: 1024 }));
 
-// Add compression middleware
-storage.use(compression({ threshold: 1024 })); // Compress if > 1KB
+// Encrypt with AES-GCM (Web Crypto API, requires a secure context: https or localhost)
+storage.use(encryptionMiddleware({ key: 'your-secret-key', algorithm: 'aes-gcm' }));
 ```
+
+Middleware `beforeSet` hooks run in registration order and `afterGet` hooks run in reverse,
+so stacked transforms (compress → encrypt on write, decrypt → decompress on read) always invert correctly.
+
+> **Encryption caveats.** Only `algorithm: 'aes-gcm'` is real encryption. `'base64'` (the current
+> default, kept for backward compatibility) and `'simple-xor'` merely obfuscate data and are deprecated.
+> Any key that ships in your client bundle can be read by whoever can read the storage, so client-side
+> encryption protects data at rest from other scripts and casual inspection, not from a determined
+> attacker with access to the page.
 
 ### Creating Custom Middleware
 

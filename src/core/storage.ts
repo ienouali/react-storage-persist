@@ -19,6 +19,7 @@ export class Storage {
   private listeners: Map<string, Set<(event: StorageChangeEvent) => void>>;
   private middleware: Middleware[];
   private cleanupInterval: any | null = null;
+  private syncHandler: ((event: StorageEvent) => void) | null = null;
 
   constructor(config: StorageConfig = {}) {
     this.config = this.normalizeConfig(config);
@@ -37,30 +38,20 @@ export class Storage {
    */
   async get<T = any>(key: string, defaultValue?: T): Promise<T | null> {
     try {
-      const fullKey = this.getFullKey(key);
-      const raw = await this.engine.getItem(fullKey);
+      const item = await this.readItem<T>(this.getFullKey(key));
 
-      if (raw === null) {
+      if (item === null) {
         this.log('get', key, 'not found');
         return defaultValue ?? null;
       }
 
-      const item = this.deserialize<StorageItem<T>>(raw);
-
       if (this.isExpired(item)) {
         this.log('get', key, 'expired');
-        await this.remove(key);
+        await this.deleteEntry(key, null);
         return defaultValue ?? null;
       }
 
-      let value = item.value;
-      for (const mw of this.middleware) {
-        if (mw.afterGet) {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-expect-error
-          value = await mw.afterGet(key, value);
-        }
-      }
+      const value = await this.runAfterGet(key, item.value);
 
       this.log('get', key, value);
       this.emit('get', { key, newValue: value });
@@ -78,7 +69,7 @@ export class Storage {
   async set<T = any>(key: string, value: T, options?: StorageOptions): Promise<void> {
     try {
       const fullKey = this.getFullKey(key);
-      const oldValue = await this.get<T>(key);
+      const oldValue = await this.peek<T>(key);
 
       let processedValue = value;
       for (const mw of this.middleware) {
@@ -114,19 +105,8 @@ export class Storage {
    */
   async remove(key: string): Promise<void> {
     try {
-      const fullKey = this.getFullKey(key);
-      const oldValue = await this.get(key);
-
-      for (const mw of this.middleware) {
-        if (mw.beforeRemove) {
-          await mw.beforeRemove(key);
-        }
-      }
-
-      await this.engine.removeItem(fullKey);
-
-      this.log('remove', key);
-      this.emit('remove', { key, oldValue });
+      const oldValue = await this.peek(key);
+      await this.deleteEntry(key, oldValue);
     } catch (error) {
       this.handleError('remove', key, error);
       throw error;
@@ -266,6 +246,10 @@ export class Storage {
       window.clearInterval(this.cleanupInterval);
       this.cleanupInterval = null;
     }
+    if (this.syncHandler) {
+      window.removeEventListener('storage', this.syncHandler);
+      this.syncHandler = null;
+    }
     this.listeners.clear();
     this.middleware = [];
     this.log('destroyed');
@@ -366,6 +350,62 @@ export class Storage {
     }
   }
 
+  private async readItem<T>(fullKey: string): Promise<StorageItem<T> | null> {
+    const raw = await this.engine.getItem(fullKey);
+    if (raw === null) return null;
+    return this.parseItem<T>(raw);
+  }
+
+  private parseItem<T>(raw: string): StorageItem<T> {
+    const item = this.deserialize<StorageItem<T>>(raw);
+    if (!isStorageItem(item)) {
+      throw new StorageError(
+        'Value was not written by this storage instance',
+        StorageErrorCode.DESERIALIZATION_FAILED
+      );
+    }
+    return item;
+  }
+
+  /**
+   * Reads the current decoded value without emitting events or deleting expired
+   * entries, so it is safe to call from set/remove without re-entering get().
+   */
+  private async peek<T>(key: string): Promise<T | null> {
+    try {
+      const item = await this.readItem<T>(this.getFullKey(key));
+      if (item === null || this.isExpired(item)) return null;
+      return await this.runAfterGet(key, item.value);
+    } catch {
+      return null;
+    }
+  }
+
+  private async deleteEntry(key: string, oldValue: unknown): Promise<void> {
+    for (const mw of this.middleware) {
+      if (mw.beforeRemove) {
+        await mw.beforeRemove(key);
+      }
+    }
+
+    await this.engine.removeItem(this.getFullKey(key));
+
+    this.log('remove', key);
+    this.emit('remove', { key, oldValue });
+  }
+
+  // afterGet unwinds in reverse so stacked transforms (e.g. compress then encrypt) invert correctly.
+  private async runAfterGet<T>(key: string, value: T): Promise<T> {
+    let result: T | null = value;
+    for (let i = this.middleware.length - 1; i >= 0; i--) {
+      const mw = this.middleware[i];
+      if (mw?.afterGet) {
+        result = await mw.afterGet(key, result);
+      }
+    }
+    return result as T;
+  }
+
   private isExpired(item: StorageItem): boolean {
     if (!item.metadata.expiresAt) return false;
     return Date.now() > item.metadata.expiresAt;
@@ -432,23 +472,64 @@ export class Storage {
   }
 
   private setupSync(): void {
-    if (typeof window !== 'undefined') {
-      window.addEventListener('storage', (event) => {
-        if (!event.key) return;
+    if (typeof window === 'undefined') return;
+    // Only Web Storage fires cross-tab `storage` events.
+    if (this.engine.name !== 'localStorage' && this.engine.name !== 'sessionStorage') return;
 
-        if (!this.matchesNamespace(event.key)) return;
+    this.syncHandler = (event: StorageEvent) => {
+      void this.handleExternalChange(event);
+    };
+    window.addEventListener('storage', this.syncHandler);
+  }
 
-        const key = this.stripNamespace(event.key);
+  private async handleExternalChange(event: StorageEvent): Promise<void> {
+    const area = this.engine.name === 'localStorage' ? window.localStorage : window.sessionStorage;
+    if (event.storageArea !== null && event.storageArea !== area) return;
 
-        try {
-          const oldValue = event.oldValue ? this.deserialize(event.oldValue) : null;
-          const newValue = event.newValue ? this.deserialize(event.newValue) : null;
+    if (event.key === null) {
+      for (const key of Array.from(this.listeners.keys())) {
+        if (key !== '*') this.emit('remove', { key });
+      }
+      this.emit('clear', { key: '*' });
+      return;
+    }
 
-          this.emit('set', { key, oldValue, newValue });
-        } catch (error) {
-          this.log('sync error', error);
-        }
-      });
+    if (!this.matchesNamespace(event.key)) return;
+    const key = this.stripNamespace(event.key);
+
+    try {
+      const [previous, next] = await Promise.all([
+        this.decodeExternal(key, event.oldValue),
+        this.decodeExternal(key, event.newValue),
+      ]);
+
+      if (next === null) {
+        this.emit('remove', { key, oldValue: previous?.value ?? null });
+      } else {
+        this.emit('set', { key, oldValue: previous?.value ?? null, newValue: next.value });
+      }
+    } catch (error) {
+      this.log('sync error', error);
     }
   }
+
+  private async decodeExternal(
+    key: string,
+    raw: string | null
+  ): Promise<{ value: unknown } | null> {
+    if (raw === null) return null;
+    const item = this.parseItem(raw);
+    if (this.isExpired(item)) return null;
+    return { value: await this.runAfterGet(key, item.value) };
+  }
+}
+
+function isStorageItem(value: unknown): value is StorageItem {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'metadata' in value &&
+    typeof (value as StorageItem).metadata === 'object' &&
+    (value as StorageItem).metadata !== null
+  );
 }

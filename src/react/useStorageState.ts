@@ -79,8 +79,11 @@ export function useStorageState<T = any>(
 
   useEffect(() => {
     const unsubscribe = storage.subscribe(key, (event) => {
-      if (event.type === 'set' && isMountedRef.current) {
+      if (!isMountedRef.current) return;
+      if (event.type === 'set') {
         setState(event.newValue as T);
+      } else if (event.type === 'remove') {
+        setState(defaultValueRef.current);
       }
     });
 
