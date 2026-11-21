@@ -71,6 +71,38 @@ describe('hooks react to removals', () => {
   });
 });
 
+describe('useStorage initial load race', () => {
+  it('keeps a write that lands before the initial read resolves', async () => {
+    const storage = getDefaultStorage();
+    const engine = (storage as any).engine;
+    const originalGetItem = engine.getItem.bind(engine);
+    let releaseLoad!: () => void;
+    const loadGate = new Promise<void>((resolve) => (releaseLoad = resolve));
+    let firstRead = true;
+    engine.getItem = async (key: string) => {
+      const value = originalGetItem(key);
+      if (firstRead) {
+        firstRead = false;
+        await loadGate;
+      }
+      return value;
+    };
+
+    const { result } = renderHook(() => useStorage('late', 'default'));
+
+    await act(async () => {
+      await storage.set('late', 'fresh');
+    });
+    expect(result.current[0]).toBe('fresh');
+
+    await act(async () => {
+      releaseLoad();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    expect(result.current[0]).toBe('fresh');
+  });
+});
+
 describe('hooks receive values from other tabs', () => {
   it('useStorage gets the plain value', async () => {
     const { result } = renderHook(() => useStorage('theme', 'light'));

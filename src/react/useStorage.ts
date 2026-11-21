@@ -9,10 +9,11 @@ export function useStorage<T = any>(
 ): [T, (value: T | ((prev: T) => T)) => Promise<void>] {
   const storage = useStorageInstance();
   const [state, setState] = useState<T>(defaultValue);
-  const [isInitialized, setIsInitialized] = useState(false);
   const isMountedRef = useRef(true);
   const stateRef = useRef(state);
   const defaultValueRef = useRef(defaultValue);
+  // A change event that lands before the initial read resolves is newer than that read.
+  const changedBeforeLoadRef = useRef(false);
 
   useEffect(() => {
     stateRef.current = state;
@@ -27,19 +28,18 @@ export function useStorage<T = any>(
 
   useEffect(() => {
     let cancelled = false;
+    changedBeforeLoadRef.current = false;
 
     const loadValue = async () => {
       try {
         const value = await storage.get<T>(key, defaultValue);
-        if (!cancelled && isMountedRef.current) {
+        if (!cancelled && isMountedRef.current && !changedBeforeLoadRef.current) {
           setState(value as T);
-          setIsInitialized(true);
         }
       } catch (error) {
         console.error('useStorage: Failed to load value', error);
-        if (!cancelled && isMountedRef.current) {
+        if (!cancelled && isMountedRef.current && !changedBeforeLoadRef.current) {
           setState(defaultValue);
-          setIsInitialized(true);
         }
       }
     };
@@ -52,19 +52,19 @@ export function useStorage<T = any>(
   }, [key]);
 
   useEffect(() => {
-    if (!isInitialized) return;
-
     const unsubscribe = storage.subscribe(key, (event) => {
       if (!isMountedRef.current) return;
       if (event.type === 'set') {
+        changedBeforeLoadRef.current = true;
         setState(event.newValue as T);
       } else if (event.type === 'remove') {
+        changedBeforeLoadRef.current = true;
         setState(defaultValueRef.current);
       }
     });
 
     return unsubscribe;
-  }, [key, isInitialized]);
+  }, [key, storage]);
 
   const setValue = useCallback(
     async (value: T | ((prev: T) => T)) => {

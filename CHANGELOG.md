@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.2.1] - Unreleased
+## [1.2.1] - 2026-11-21
 
 ### Fixed
 - Reading or removing an expired TTL entry recursed `get → remove → get` forever, freezing the page (also triggered by the 5-minute cleanup).
@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `compressionMiddleware` no longer corrupts values containing `x*N` patterns or throws on nested objects; it now uses native gzip/deflate via `CompressionStream` and only stores the compressed form when it is smaller.
 - `useStorage`, `useStorageState`, `useStorageList` and `useStorageReducer` reset to their default value when the key is removed.
 - `useStorageReducer` no longer writes state received from storage back to storage, which made tabs echo writes to each other indefinitely.
+- `useStorage` subscribes on mount instead of after its first read, so writes that land while it is still loading are no longer lost or overwritten by the stale read.
 
 ### Added
 - `encryptionMiddleware({ algorithm: 'aes-gcm' })`: real AES-GCM encryption with a PBKDF2-derived key (`salt`, `iterations` options).
@@ -168,4 +169,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documentation updates
 - Performance improvements
 
+[1.2.1]: https://github.com/ienouali/react-storage-persist/compare/v1.2.0...v1.2.1
+[1.2.0]: https://github.com/ienouali/react-storage-persist/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/ienouali/react-storage-persist/compare/v1.0.1...v1.1.0
 [1.0.0]: https://github.com/ienouali/react-storage-persist/releases/tag/v1.0.0
