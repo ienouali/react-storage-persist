@@ -9,5 +9,5 @@ export default {
     endOfLine: 'lf',
     bracketSpacing: true,
     jsxSingleQuote: false,
-    jsxBracketSameLine: false,
+    bracketSameLine: false,
 };

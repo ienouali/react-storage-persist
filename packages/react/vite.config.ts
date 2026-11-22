@@ -7,7 +7,10 @@ export default defineConfig({
   plugins: [react(), dts({ include: ['src'], tsconfigPath: './tsconfig.json', rollupTypes: true })],
   build: {
     lib: {
-      entry: { index: resolve(__dirname, 'src/index.ts') },
+      entry: {
+        index: resolve(__dirname, 'src/index.ts'),
+        middleware: resolve(__dirname, 'src/middleware.ts'),
+      },
       formats: ['es', 'cjs'],
       fileName: (format, entryName) => `${entryName}.${format === 'es' ? 'mjs' : 'cjs'}`,
     },

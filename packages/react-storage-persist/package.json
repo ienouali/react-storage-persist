@@ -51,7 +51,9 @@
   "files": [
     "*.js",
     "*.cjs",
-    "*.d.ts"
+    "*.d.ts",
+    "README.md",
+    "LICENSE"
   ],
   "sideEffects": false,
   "dependencies": {

@@ -9,3 +9,5 @@ export { StorageProvider, useStorageContext } from './StorageContext';
 export type { UseStorageStateResult } from './useStorageState';
 export type { UseStorageListActions, UseStorageListResult } from './useStorageList';
 export type { StorageProviderProps } from './StorageContext';
+
+export * from '@storage-persist/core';

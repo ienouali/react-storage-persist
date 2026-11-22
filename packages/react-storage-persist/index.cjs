@@ -1,4 +1,1 @@
-module.exports = {
-  ...require('@storage-persist/core'),
-  ...require('@storage-persist/react'),
-};
+module.exports = require('@storage-persist/react');
