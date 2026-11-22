@@ -26,7 +26,6 @@ playwright/.cache/
 !.vscode/launch.json
 !.vscode/extensions.json
 .idea
-.changeset
 .vscode/*
 # NPM
 .npmrc

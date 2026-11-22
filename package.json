@@ -1,94 +1,28 @@
 {
-  "name": "react-storage-persist",
-  "version": "1.2.1",
-  "description": "Persistent state management for React. Store data reliably across sessions with automatic fallbacks, built-in TTL, and seamless TypeScript support",
-  "author": "ienouali",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ienouali/react-storage-persist.git"
-  },
-  "bugs": {
-    "url": "https://github.com/ienouali/react-storage-persist/issues"
-  },
-  "homepage": "https://github.com/ienouali/react-storage-persist#readme",
-  "keywords": [
-    "react",
-    "storage",
-    "localstorage",
-    "sessionstorage",
-    "indexeddb",
-    "persistence",
-    "state-management",
-    "typescript",
-    "hooks",
-    "middleware",
-    "react-hooks",
-    "browser-storage",
-    "persistent-state"
-  ],
+  "name": "storage-persist-monorepo",
+  "private": true,
   "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
-    },
-    "./core": {
-      "types": "./dist/core.d.ts",
-      "import": "./dist/core.mjs",
-      "require": "./dist/core.cjs"
-    },
-    "./react": {
-      "types": "./dist/react.d.ts",
-      "import": "./dist/react.mjs",
-      "require": "./dist/react.cjs"
-    },
-    "./middleware": {
-      "types": "./dist/middleware.d.ts",
-      "import": "./dist/middleware.mjs",
-      "require": "./dist/middleware.cjs"
-    }
-  },
-  "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
-  ],
-  "sideEffects": false,
   "scripts": {
-    "dev": "vite",
-    "dev:test": "vite demo --port 5173",
-    "demo": "vite demo --port 5173",
-    "demo:build": "vite build demo",
-    "demo:preview": "vite preview demo",
-    "demo2": "vite demo2 --port 5174",
-    "demo2:build": "vite build demo2",
-    "demo2:preview": "vite preview demo2",
-    "build": "tsc -p tsconfig.build.json && vite build",
-    "build:watch": "vite build --watch",
+    "build": "pnpm -r --filter \"./packages/*\" build",
     "type-check": "tsc --noEmit",
-    "lint": "eslint src",
-    "lint:fix": "eslint src --fix",
-    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "lint": "eslint packages/*/src",
+    "lint:fix": "eslint packages/*/src --fix",
+    "format": "prettier --write \"packages/*/src/**/*.{ts,tsx}\"",
+    "format:check": "prettier --check \"packages/*/src/**/*.{ts,tsx}\"",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "prepublishOnly": "npm run type-check && npm run lint && npm run test:run && npm run build",
-    "release": "npm run build && npm publish"
-  },
-  "peerDependencies": {
-    "react": ">=16.8.0",
-    "react-dom": ">=16.8.0"
+    "demo": "pnpm --filter react-demo dev",
+    "dev:test": "pnpm --filter react-demo dev --port 5173",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm build && changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "^3.0.3",
     "@eslint/js": "^9.39.5",
     "@playwright/test": "^1.41.0",
     "@testing-library/jest-dom": "^6.2.0",
@@ -124,7 +58,7 @@
     "vitest": "^1.2.0"
   },
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
-  }
+    "node": ">=18.0.0"
+  },
+  "packageManager": "pnpm@10.34.9+sha512.f49b5a8ea0fdedb44bb3c0c1d6575092a53c2950d95b7ad15df11f17974877a2de3a01c07e934e9b28ce716e51c09a94962c7306d09be2e1e4b18a8c8762fd32"
 }

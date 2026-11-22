@@ -1,0 +1,57 @@
+{
+  "name": "@storage-persist/react",
+  "version": "1.2.1",
+  "description": "React hooks for persistent browser storage with TTL, middleware and cross-tab sync",
+  "author": "ienouali",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ienouali/react-storage-persist.git",
+    "directory": "packages/react"
+  },
+  "bugs": {
+    "url": "https://github.com/ienouali/react-storage-persist/issues"
+  },
+  "homepage": "https://github.com/ienouali/react-storage-persist#readme",
+  "keywords": [
+    "react",
+    "react-hooks",
+    "storage",
+    "localstorage",
+    "indexeddb",
+    "persistence",
+    "persistent-state",
+    "typescript"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@storage-persist/core": "workspace:^"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

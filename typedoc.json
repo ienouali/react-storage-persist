@@ -1,11 +1,15 @@
 {
-  "entryPoints": ["src/index.ts"],
+  "entryPoints": [
+    "packages/core/src/index.ts",
+    "packages/core/src/middleware/index.ts",
+    "packages/react/src/index.ts"
+  ],
   "out": "docs",
   "plugin": [],
   "excludePrivate": true,
   "excludeProtected": true,
   "excludeExternals": true,
   "readme": "README.md",
-  "name": "React Storage Persist",
+  "name": "Storage Persist",
   "includeVersion": true
 }

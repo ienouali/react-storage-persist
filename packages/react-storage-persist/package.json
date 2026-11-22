@@ -1,0 +1,67 @@
+{
+  "name": "react-storage-persist",
+  "version": "1.2.1",
+  "description": "Moved to @storage-persist/react. This package re-exports @storage-persist/core and @storage-persist/react so existing imports keep working.",
+  "author": "ienouali",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ienouali/react-storage-persist.git",
+    "directory": "packages/react-storage-persist"
+  },
+  "bugs": {
+    "url": "https://github.com/ienouali/react-storage-persist/issues"
+  },
+  "homepage": "https://github.com/ienouali/react-storage-persist#readme",
+  "keywords": [
+    "react",
+    "storage",
+    "localstorage",
+    "indexeddb",
+    "persistence",
+    "react-hooks"
+  ],
+  "type": "module",
+  "main": "./index.cjs",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "require": "./index.cjs"
+    },
+    "./core": {
+      "types": "./core.d.ts",
+      "import": "./core.js",
+      "require": "./core.cjs"
+    },
+    "./react": {
+      "types": "./react.d.ts",
+      "import": "./react.js",
+      "require": "./react.cjs"
+    },
+    "./middleware": {
+      "types": "./middleware.d.ts",
+      "import": "./middleware.js",
+      "require": "./middleware.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "*.js",
+    "*.cjs",
+    "*.d.ts"
+  ],
+  "sideEffects": false,
+  "dependencies": {
+    "@storage-persist/core": "workspace:^",
+    "@storage-persist/react": "workspace:^"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

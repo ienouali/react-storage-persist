@@ -3,8 +3,5 @@
   "compilerOptions": {
     "types": ["vitest/globals", "@testing-library/jest-dom", "node"]
   },
-  "include": [
-    "src/**/*",
-    "tests/**/*"
-  ]
+  "include": ["packages/*/src", "packages/*/tests", "vitest.setup.ts"]
 }

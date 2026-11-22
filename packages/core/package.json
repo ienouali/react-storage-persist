@@ -1,0 +1,56 @@
+{
+  "name": "@storage-persist/core",
+  "version": "1.2.1",
+  "description": "Persistent browser storage with TTL, middleware, cross-tab sync and automatic fallbacks",
+  "author": "ienouali",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ienouali/react-storage-persist.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/ienouali/react-storage-persist/issues"
+  },
+  "homepage": "https://github.com/ienouali/react-storage-persist#readme",
+  "keywords": [
+    "storage",
+    "localstorage",
+    "sessionstorage",
+    "indexeddb",
+    "persistence",
+    "ttl",
+    "middleware",
+    "typescript"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    },
+    "./middleware": {
+      "types": "./dist/middleware.d.ts",
+      "import": "./dist/middleware.mjs",
+      "require": "./dist/middleware.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "vite build"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

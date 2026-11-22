@@ -1,0 +1,7 @@
+{
+  "name": "@storage-persist/vue",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Vue composables for persistent browser storage (work in progress)",
+  "license": "MIT"
+}
