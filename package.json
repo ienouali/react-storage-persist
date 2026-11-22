@@ -22,7 +22,7 @@
     "release": "pnpm build && changeset publish"
   },
   "devDependencies": {
-    "@changesets/cli": "^3.0.3",
+    "@changesets/cli": "^2.31.1",
     "@eslint/js": "^9.39.5",
     "@playwright/test": "^1.41.0",
     "@testing-library/jest-dom": "^6.2.0",
