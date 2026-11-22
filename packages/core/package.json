@@ -1,6 +1,6 @@
 {
   "name": "@storage-persist/core",
-  "version": "1.2.1",
+  "version": "2.0.0-next.0",
   "description": "Persistent browser storage with TTL, middleware, cross-tab sync and automatic fallbacks",
   "author": "ienouali",
   "license": "MIT",
